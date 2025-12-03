@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payment Form</title>
+
+<style>
+    /* ********** (၁) လိပ်ပြာပုံစံအတွက် ပြင်ဆင်ထားသော Style များ ********** */
+    body {
+        font-family: Arial, sans-serif;
+        /* အနက်ရောင်/အပြာရောင် ရောစပ်ထားသော နောက်ခံ - မျက်စိအေးစေရန် */
+        background: linear-gradient(180deg, #0A192F 0%, #171B36 100%);
+        color: #E0E0E0; /* စာလုံးအရောင်ကို အမှောင်နောက်ခံနဲ့ လိုက်ဖက်အောင် ပြောင်းထားခြင်း */
+        margin: 0;
+        padding: 15px;
+        min-height: 100vh; /* မျက်နှာပြင်အပြည့်ဖြစ်စေရန် */
+    }
+
+    /* လိပ်ပြာ effect အတွက် background image သို့မဟုတ် animation များကို ထည့်နိုင်သော်လည်း၊ 
+       code ရိုးရှင်းစေရန် solid dark background ကို ဦးစားပေးသုံးထားပါသည်။ */
+    
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #43D8FF; /* ခေါင်းစဉ်ကို အပြာရောင်အလင်းရောင်ဖြင့် ပြောင်းထားခြင်း */
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(67, 216, 255, 0.4); /* Neon Effect */
+    }
+
+    /* Switch buttons */
+    .switch-box { text-align:center; margin-bottom:15px; }
+    .switch-box button {
+        padding:10px 18px;
+        border:none;
+        border-radius:8px;
+        margin:3px;
+        cursor:pointer;
+        font-weight:bold;
+        color:white;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .switch-box button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .btn-deposit { background:#007bff; box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4); }
+    .btn-withdraw { background:#ff4757; box-shadow: 0 3px 10px rgba(255, 71, 87, 0.4); }
+
+
+    /* ********** (၂) Card Box Style ကို Glassmorphism ပုံစံ ပြင်ထားခြင်း ********** */
+    .card-box {
+        background: rgba(255, 255, 255, 0.1); /* ဖောက်ထွင်းမြင်ရမှု */
+        padding: 20px;
+        border-radius: 18px; /* Corner ဝိုင်းတာ ပိုများလာခြင်း */
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* ပိုထင်ရှားသော Shadow */
+        backdrop-filter: blur(10px); /* Glass Effect */
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        margin-bottom: 20px;
+    }
+
+    /* Deposit Pay rows */
+    .pay-row {
+        display: flex;
+        align-items:center;
+        justify-content:space-between;
+        background:rgba(255, 255, 255, 0.08); /* ဖောက်ထွင်းမြင်ရမှု */
+        padding:12px;
+        border-radius:12px;
+        border:2px solid transparent;
+        cursor:pointer;
+        margin-bottom:12px;
+        transition: all 0.3s ease;
+        color: #fff; /* စာလုံးအရောင်ကို အဖြူပြောင်းထားခြင်း */
+    }
+    .pay-row:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .pay-row.selected {
+        border:2px solid #43D8FF; /* လိပ်ပြာအရောင် အပြာနု */
+        background:rgba(67, 216, 255, 0.15);
+    }
+
+    .pay-left {
+        display:flex;
+        align-items:center;
+        gap:12px;
+    }
+
+    .copy-btn {
+        background:#43D8FF;
+        color:white;
+        padding:6px 14px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+        font-size:14px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(67, 216, 255, 0.4);
+    }
+
+    /* Withdraw method boxes */
+    .withdraw-methods {
+        display:flex;
+        gap:15px;
+        margin-bottom:15px;
+    }
+
+    .withdraw-box {
+        flex:1;
+        background:rgba(255, 255, 255, 0.08);
+        text-align:center;
+        padding:18px 12px;
+        border-radius:12px;
+        border:2px solid transparent;
+        cursor:pointer;
+        transition: all 0.3s ease;
+    }
+    .withdraw-box:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .withdraw-box.selected {
+        background:rgba(67, 216, 255, 0.15);
+        border:2px solid #43D8FF;
+    }
+
+    .withdraw-box img {
+        width:50px; height:50px; margin-bottom:8px;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(67, 216, 255, 0.2);
+    }
+
+    /* Inputs */
+    .input-box { margin-bottom:20px; }
+    .input-box label { font-weight:bold; margin-bottom:8px; display:block; color: #B0B0B0; }
+    .input-box input {
+        width:100%;
+        height:45px;
+        border:2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(0, 0, 0, 0.2);
+        color: #fff; /* Input ထဲက စာလုံးအရောင် */
+        border-radius:12px;
+        padding-left:15px;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    .input-box input:focus {
+        border-color: #43D8FF;
+        outline: none;
+        box-shadow: 0 0 5px rgba(67, 216, 255, 0.5);
+    }
+
+    .btn-send {
+        width:100%;
+        padding:16px;
+        background:#43D8FF;
+        color:rgb(10, 25, 47); /* အပြာနုရောင်ပေါ်မှာ ပေါ်လွင်စေဖို့ */
+        border:none;
+        font-size:18px;
+        font-weight:bold;
+        border-radius:14px;
+        cursor:pointer;
+        box-shadow: 0 6px 20px rgba(67, 216, 255, 0.4);
+        transition: background 0.2s, transform 0.2s;
+    }
+    .btn-send:hover {
+        background: #68F0FF;
+        transform: translateY(-2px);
+    }
+
+
+    /* ******** ALERT MODAL (Center Position Fixed) ******** */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; 
+        left: 0;
+        width: 100%; 
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        /* ********** အလယ်ဗဟိုမှာ ပေါ်စေရန် ထည့်ထားသော Style ********** */
+        display: flex; /* အမြဲတမ်း flex ကိုသုံးပြီး စောင့်နေစေခြင်း */
+        justify-content: center; /* အလျားလိုက် အလယ်တည့်တည့် */
+        align-items: center; /* ဒေါင်လိုက် အလယ်တည့်တည့် */
+        z-index: 1000;
+    }
+    /* Note: JavaScript က modal.style.display ကို 'flex' နဲ့ 'none' လဲပေးထားပြီးသားမို့ ပြန်ထည့်ထားစရာမလိုပါဘူး။ */
+
+    .modal-content {
+        background: #232a4a;
+        padding: 30px;
+        border-radius: 16px;
+        width: 85%;
+        max-width: 350px;
+        text-align: center;
+        animation: fadeIn 0.5s ease;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        color: #fff;
+    }
+
+    @keyframes fadeIn {
+        from { opacity:0; transform: translateY(15px); }
+        to { opacity:1; transform: translateY(0); }
+    }
+
+    .modal-content button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        border:none;
+        background:#43D8FF;
+        border-radius:8px;
+        color: #000; /* စာလုံးအရောင်ကို အနက်ရောင်ပြောင်းထားခြင်း */
+        cursor:pointer;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+    .modal-content button:hover {
+        background: #68F0FF;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>💰 ငွေလုပ်ဆောင်မှု</h2>
+
+<div class="switch-box">
+    <button class="btn-deposit" onclick="showDeposit()">💰 ငွေသွင်းရန်</button>
+    <button class="btn-withdraw" onclick="showWithdraw()">💸 ငွေထုတ်ရန်</button>
+</div>
+
+<div id="depositForm" class="card-box">
+
+    <div class="pay-row" id="kpayRow" onclick="selectDeposit('kpay')">
+        <div class="pay-left">
+            <img src="https://atagamingshop.com/payment/kpay.png" width="50">
+            <div>
+                <b>DAW HAYMARN LIN</b><br>
+                <span id="kpayNumber">09753821484</span>
+            </div>
+        </div>
+        <button class="copy-btn" onclick="copyNumber('kpayNumber', event)">Copy</button>
+    </div>
+
+    <div class="pay-row" id="waveRow" onclick="selectDeposit('wave')">
+        <div class="pay-left">
+            <img src="https://atagamingshop.com/payment/wave.png" width="50">
+            <div>
+                <b>Hay Marn Lin</b><br>
+                <span id="waveNumber">09753821484</span>
+            </div>
+        </div>
+        <button class="copy-btn" onclick="copyNumber('waveNumber', event)">Copy</button>
+    </div>
+
+    <div class="input-box">
+        <label>👤 User Name ထည့်ပါ</label>
+        <input type="text" id="d_username">
+    </div>
+
+    <div class="input-box">
+        <label>💵 ငွေပမာဏ ထည့်ပါ</label>
+        <input type="number" id="d_amount">
+    </div>
+
+    <div class="input-box">
+        <label>🖼 ပြေစာ Upload လုပ်ပါ</label>
+        <input type="file" id="d_slip">
+    </div>
+
+    <button class="btn-send" onclick="sendDeposit()">📤 Send</button>
+</div>
+
+
+
+
+<div id="withdrawForm" class="card-box" style="display:none;">
+
+    <div class="withdraw-methods">
+        <div class="withdraw-box" id="wKpay" onclick="selectWithdraw('kpay')">
+            <img src="https://atagamingshop.com/payment/kpay.png">
+            <b>KPay</b>
+        </div>
+
+        <div class="withdraw-box" id="wWave" onclick="selectWithdraw('wave')">
+            <img src="https://atagamingshop.com/payment/wave.png">
+            <b>WavePay</b>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>👤 User Name ထည့်ပါ</label>
+        <input type="text" id="w_username">
+    </div>
+
+    <div class="input-box">
+        <label>💵 ငွေပမာဏ ထည့်ပါ</label>
+        <input type="number" id="w_amount">
+    </div>
+
+    <div class="input-box">
+        <label>📱 ဖုန်းနံပါတ် ထည့်ပါ</label>
+        <input type="number" id="w_phone">
+    </div>
+
+    <button class="btn-send" onclick="sendWithdraw()">📤 Withdraw Send</button>
+</div>
+
+
+
+
+<div id="alertModal" class="modal">
+    <div class="modal-content">
+        <div id="alertText">Message</div>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+
+
+
+<script>
+/* Telegram */
+const BOT = "8520407720:AAHDQowI17wLw9ZWpRin8i5QAslYq1clqE4";
+const CHAT = "@batmandeposit";
+
+/* Switch Tabs */
+function showDeposit(){
+    depositForm.style.display="block";
+    withdrawForm.style.display="none";
+}
+
+function showWithdraw(){
+    depositForm.style.display="none";
+    withdrawForm.style.display="block";
+}
+
+/* ---------- Deposit Select ---------- */
+let d_method = null;
+
+function selectDeposit(method){
+    d_method = method;
+    kpayRow.classList.remove("selected");
+    waveRow.classList.remove("selected");
+
+    if(method==="kpay") kpayRow.classList.add("selected");
+    if(method==="wave") waveRow.classList.add("selected");
+}
+
+/* ---------- Withdraw Select ---------- */
+let w_method = null;
+
+function selectWithdraw(method){
+    w_method = method;
+    wKpay.classList.remove("selected");
+    wWave.classList.remove("selected");
+
+    if(method==="kpay") wKpay.classList.add("selected");
+    if(method==="wave") wWave.classList.add("selected");
+}
+
+/* ---------- Copy ---------- */
+function copyNumber(id, event){
+    event.stopPropagation();
+    navigator.clipboard.writeText(document.getElementById(id).innerText);
+    showAlert("📋 Copy ဖြစ်ပြီးပါပြီ!");
+}
+
+/* ---------- Send Deposit ---------- */
+function sendDeposit(){
+
+    let name = d_username.value.trim();
+    let amount = d_amount.value.trim();
+    let slip = d_slip.files[0];
+
+    if(!d_method) return showAlert("⚠️ KPay/WavePay မရွေးရသေးပါ!");
+    if(name==="") return showAlert("⚠️ User Name မထည့်ရသေးပါ!");
+    if(amount==="") return showAlert("⚠️ Amount မထည့်ရသေးပါ!");
+    if(!slip) return showAlert("⚠️ ပြေစာ Upload မလုပ်ရသေးပါ!");
+
+    let methodName = d_method==="kpay" ? "KPay" : "WavePay";
+
+    let caption =
+`🔔 Deposit  
+📌 ${methodName}  
+👤 ${name}  
+💵 ${amount} Ks`;
+
+    /* Photo + caption */
+    let fd = new FormData();
+    fd.append("chat_id", CHAT);
+    fd.append("photo", slip);
+    fd.append("caption", caption);
+
+    fetch(`https://api.telegram.org/bot${BOT}/sendPhoto`, {
+        method:"POST",
+        body:fd
+    });
+
+    showAlert("Admin ဆီသို့ ပို့ပြီးပါပြီ!");
+}
+
+
+
+/* ---------- Send Withdraw ---------- */
+function sendWithdraw(){
+
+    let name = w_username.value.trim();
+    let amount = w_amount.value.trim();
+    let phone = w_phone.value.trim();
+
+    if(!w_method) return showAlert("⚠️ KPay/WavePay ကို ရွေးပါ!");
+    if(name==="") return showAlert("⚠️ User Name မထည့်ရသေးပါ!");
+    if(amount==="") return showAlert("⚠️ Amount မထည့်ရသေးပါ!");
+    if(phone==="") return showAlert("⚠️ Phone မထည့်ရသေးပါ!");
+
+    let methodName = w_method==="kpay" ? "KPay" : "WavePay";
+
+    let text =
+`🔔 Withdraw  
+📌 ${methodName}  
+👤 ${name}  
+💵 ${amount} Ks  
+📱 ${phone}`;
+
+    let fd = new FormData();
+    fd.append("chat_id", CHAT);
+    fd.append("text", text);
+
+    fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
+        method:"POST",
+        body:fd
+    });
+
+    showAlert("Withdraw Request ပို့ပြီးပါပြီ!");
+}
+
+
+
+
+/* ---------- Modal Alert ---------- */
+function showAlert(msg){
+    alertText.innerText = msg;
+    alertModal.style.display = "flex";
+}
+
+function closeAlert(){
+    alertModal.style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
